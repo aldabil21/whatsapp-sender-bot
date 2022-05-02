@@ -12,4 +12,6 @@ module com.wabot {
 
     opens com.wabot to javafx.fxml;
     exports com.wabot;
+    exports com.wabot.controller;
+    opens com.wabot.controller to javafx.fxml;
 }

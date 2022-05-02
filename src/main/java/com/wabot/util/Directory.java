@@ -2,7 +2,7 @@ package com.wabot.util;
 
 import java.nio.file.Paths;
 
-public class Util {
+public class Directory {
     private static final String appDir = System.getProperty("java.app.dir");
     private static final boolean isProd = appDir != null;
     private static final String OS;

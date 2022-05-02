@@ -17,7 +17,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <jvm.modules>java.base,javafx.controls,javafx.fxml,java.sql,java.logging</jvm.modules>
-        <javafx.version>17.0.2</javafx.version>
+        <javafx.version>18.0.1</javafx.version>
         <junit.version>5.8.2</junit.version>
         <!-- Replace this UUID with a custom one for your project. This ID is used by the Windows installer system
         to know that an installer is intended to replace/upgrade an earlier version. The easiest thing to do is
@@ -45,6 +45,11 @@
         <dependency>
             <groupId>org.kordamp.ikonli</groupId>
             <artifactId>ikonli-javafx</artifactId>
+            <version>12.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.kordamp.ikonli</groupId>
+            <artifactId>ikonli-feather-pack</artifactId>
             <version>12.3.1</version>
         </dependency>
         <dependency>

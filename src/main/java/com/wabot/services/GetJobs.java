@@ -1,7 +1,7 @@
 package com.wabot.services;
 
 import com.wabot.model.Job;
-import com.wabot.model.Sqlite;
+import com.wabot.util.Sqlite;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;

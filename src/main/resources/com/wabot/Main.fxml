@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<BorderPane prefHeight="500" prefWidth="800" stylesheets="@css/styles.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.wabot.controller.Main">
+    <right>
+
+    </right>
+    <right>
+        <AnchorPane prefHeight="500.0" prefWidth="250.0" style="-fx-background-color: primary;" BorderPane.alignment="CENTER">
+            <children>
+                <Pane prefHeight="123.0" prefWidth="250.0" style="-fx-background-color: #ffffff10;">
+                    <children>
+                        <Label contentDisplay="CENTER" layoutX="55.0" layoutY="45.0" prefHeight="34.0" style="-fx-text-fill: light-white;" text="واتـســاب بــوت">
+                            <font>
+                                <Font name="System Bold" size="18.0" />
+                            </font>
+                        </Label>
+                    </children>
+                </Pane>
+            <Button alignment="CENTER_RIGHT" contentDisplay="RIGHT" focusTraversable="false" layoutY="150.0" mnemonicParsing="false" onAction="#handleMenu" prefHeight="60.0" prefWidth="250.0" styleClass="menu" text="رسائل جماعية">
+               <font>
+                  <Font name="System Bold" size="16.0" />
+               </font>
+               <graphic>
+                  <FontIcon fill="#edf6f9" iconLiteral="fth-message-circle" iconSize="35" wrappingWidth="50.0" />
+               </graphic>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Button>
+            <Button alignment="CENTER_RIGHT" contentDisplay="RIGHT" focusTraversable="false" layoutY="220.0" mnemonicParsing="false" onAction="#handleMenu" prefHeight="60.0" prefWidth="250.0" styleClass="menu" text="تحميل ملف إكسل">
+               <font>
+                  <Font name="System Bold" size="16.0" />
+               </font>
+               <graphic>
+                  <FontIcon fill="#edf6f9" iconLiteral="fth-file-text" iconSize="35" wrappingWidth="50.0" />
+               </graphic>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Button>
+            <Button alignment="CENTER_RIGHT" contentDisplay="RIGHT" focusTraversable="false" layoutY="290.0" mnemonicParsing="false" onAction="#handleMenu" prefHeight="60.0" prefWidth="250.0" styleClass="menu" text="تصدير الأرقام">
+               <font>
+                  <Font name="System Bold" size="16.0" />
+               </font>
+               <graphic>
+                  <FontIcon fill="#edf6f9" iconLiteral="fth-save" iconSize="35" wrappingWidth="50.0" />
+               </graphic>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Button>
+            <Button alignment="CENTER_RIGHT" contentDisplay="RIGHT" focusTraversable="false" layoutY="360.0" mnemonicParsing="false" onAction="#handleMenu" prefHeight="60.0" prefWidth="250.0" styleClass="menu" text="قائمة المهام">
+               <font>
+                  <Font name="System Bold" size="16.0" />
+               </font>
+               <graphic>
+                  <FontIcon fill="#edf6f9" iconLiteral="fth-list" iconSize="35" rotate="180.0" textAlignment="RIGHT" wrappingWidth="50.0" />
+               </graphic>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Button>
+            <Button alignment="CENTER_RIGHT" contentDisplay="RIGHT" focusTraversable="false" layoutY="430.0" mnemonicParsing="false" onAction="#handleMenu" prefHeight="60.0" prefWidth="250.0" styleClass="menu" text="مـســــاعـدة">
+               <font>
+                  <Font name="System Bold" size="16.0" />
+               </font>
+               <graphic>
+                  <FontIcon fill="#edf6f9" iconLiteral="fth-help-circle" iconSize="35" wrappingWidth="50.0" />
+               </graphic>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Button>
+            </children>
+        </AnchorPane>
+    </right>
+</BorderPane>

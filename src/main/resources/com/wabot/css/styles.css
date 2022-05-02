@@ -1,0 +1,22 @@
+.root {
+    primary: #283618;
+    primary-light: #606c38;
+    secondary: #bc6c25;
+    secondary-light: #dda15e;
+    light-white: #EDF6F9;
+}
+
+.button.menu {
+    -fx-background-color: #ffffff20;
+    -fx-text-fill: light-white;
+    -fx-background-radius: 0;
+    -fx-graphic-text-gap: 15;
+}
+
+.button.menu:hover, .button.menu:selected {
+    -fx-background-color: primary-light;
+}
+
+.button.menu:pressed {
+    -fx-background-color: primary;
+}

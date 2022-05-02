@@ -1,6 +1,5 @@
-package com.wabot.model;
+package com.wabot.util;
 
-import com.wabot.util.Util;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 
@@ -15,14 +14,14 @@ import java.sql.SQLException;
 
 public final class Sqlite {
     private static final String DB_NAME = "database.db";
-    public static final String CONNECTION_STRING = "jdbc:sqlite:" + Paths.get(Util.getDbDir(), DB_NAME);
+    public static final String CONNECTION_STRING = "jdbc:sqlite:" + Paths.get(Directory.getDbDir(), DB_NAME);
     private static final Sqlite instance = new Sqlite();
     private Connection connection;
 
     private Sqlite() {
         try {
             //Check if already has db
-            Path dbPath = Paths.get(Util.getDbDir());
+            Path dbPath = Paths.get(Directory.getDbDir());
             boolean hasDB = false;
             if (!Files.isDirectory(dbPath)) {
                 Files.createDirectory(dbPath);

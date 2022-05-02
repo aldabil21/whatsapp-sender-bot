@@ -2,9 +2,7 @@ package com.wabot;
 
 import com.wabot.model.Job;
 import com.wabot.services.GetJobs;
-import com.wabot.util.Util;
 import io.github.bonigarcia.wdm.WebDriverManager;
-import io.opentelemetry.api.internal.Utils;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -75,9 +73,6 @@ public class MainController {
     }
 
     public void initialize() {
-//        System.out.println(Util.getAppDir());
-//        System.out.println(Util.getDbDir());
-//        System.out.println(Util.getChromeDriverPath());
         menuListeners();
     }
 

@@ -7,4 +7,3 @@
 --runtime-image "${project.build.directory}/jvm-image"
 --temp "${project.build.directory}/installer-work"
 --java-options "-Djava.app.dir=$APPDIR"
---linux-package-name "Whatsapp Bot"

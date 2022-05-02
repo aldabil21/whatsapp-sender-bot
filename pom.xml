@@ -319,22 +319,6 @@
         It would be great if Maven automatically added the os family as a property by default
          -->
         <profile>
-            <id>linux</id>
-            <activation>
-                <os>
-                    <family>linux</family>
-                </os>
-            </activation>
-           <build>
-               <resources>
-                   <resource>
-                       <directory>${project.basedir}/res/linux</directory>
-                       <targetPath>${project.build.directory}/dependency</targetPath>
-                   </resource>
-               </resources>
-           </build>
-        </profile>
-        <profile>
             <id>windows</id>
             <activation>
                 <os>
@@ -342,12 +326,6 @@
                 </os>
             </activation>
             <build>
-                <resources>
-                    <resource>
-                        <directory>${project.basedir}/res/windows</directory>
-                        <targetPath>${project.build.directory}/dependency</targetPath>
-                    </resource>
-                </resources>
                 <plugins>
                     <plugin>
                         <!-- This adds a "launch on finish" to the Windows msi installer. This just tweaks the Windows

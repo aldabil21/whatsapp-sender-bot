@@ -2,7 +2,7 @@
 --icon "${project.basedir}/app-icon.icns"
 --dest "${project.build.directory}"
 --main-jar ${project.build.finalName}.jar
---main-class ${main-class}
+--main-class ${mainClass}
 --input "${project.build.directory}/dependency"
 --app-version ${app.version}
 --runtime-image "${project.build.directory}/jvm-image"

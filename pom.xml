@@ -8,10 +8,11 @@
     <artifactId>wabot</artifactId>
     <version>0.0.1</version>
     <name>wabot</name>
+    <description>Whatsapp Bot With Extra Functionalities</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <app.name>wabot</app.name>
+        <app.name>Whatsapp Bot</app.name>
         <mainClass>com.wabot.Main</mainClass>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
@@ -50,6 +51,11 @@
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
             <version>4.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.bonigarcia</groupId>
+            <artifactId>webdrivermanager</artifactId>
+            <version>5.1.1</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -96,13 +102,6 @@
             <!-- Add the default resource path back in - by overriding above it disables the default -->
             <resource>
                 <directory>${project.basedir}/src/main/resources</directory>
-            </resource>
-            <resource>
-                <directory>${project.basedir}/res</directory>
-                <excludes>
-                    <exclude>*.db</exclude>
-                </excludes>
-                <targetPath>${project.build.directory}/dependency</targetPath>
             </resource>
         </resources>
         <plugins>
@@ -193,6 +192,8 @@
                             <failOnError>true</failOnError>
                             <removeDirectories>${project.build.directory}/installer-work</removeDirectories>
                             <args>@${project.build.directory}/packaging/${os.detected.name}-jpackage.txt</args>
+                            <name>${app.name}</name>
+                            <description>${project.description}</description>
                         </configuration>
                     </execution>
                 </executions>
@@ -317,27 +318,36 @@
         These properties are then use to build the directory paths to the platform specific resources.
         It would be great if Maven automatically added the os family as a property by default
          -->
-
         <profile>
-            <id>macos-sign</id>
+            <id>linux</id>
             <activation>
-                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>linux</family>
+                </os>
             </activation>
-            <properties>
-                <macos.sign>--mac-sign</macos.sign>
-                <!-- You will have to replace this with your own dev information from your Apple identity -->
-                <macos.sign.identity>--mac-signing-key-user-name "Company Name, Inc. (BXPXTXC35S)"</macos.sign.identity>
-            </properties>
+           <build>
+               <resources>
+                   <resource>
+                       <directory>${project.basedir}/res/linux</directory>
+                       <targetPath>${project.build.directory}/dependency</targetPath>
+                   </resource>
+               </resources>
+           </build>
         </profile>
-
         <profile>
-            <id>windows-active</id>
+            <id>windows</id>
             <activation>
                 <os>
                     <family>windows</family>
                 </os>
             </activation>
             <build>
+                <resources>
+                    <resource>
+                        <directory>${project.basedir}/res/windows</directory>
+                        <targetPath>${project.build.directory}/dependency</targetPath>
+                    </resource>
+                </resources>
                 <plugins>
                     <plugin>
                         <!-- This adds a "launch on finish" to the Windows msi installer. This just tweaks the Windows
@@ -366,6 +376,17 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+        <profile>
+            <id>macos-sign</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <macos.sign>--mac-sign</macos.sign>
+                <!-- You will have to replace this with your own dev information from your Apple identity -->
+                <macos.sign.identity>--mac-signing-key-user-name "Company Name, Inc. (BXPXTXC35S)"</macos.sign.identity>
+            </properties>
         </profile>
     </profiles>
 </project>

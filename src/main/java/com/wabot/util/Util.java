@@ -9,26 +9,34 @@ import java.util.List;
 public class Util {
     private static final String appDir = System.getProperty("java.app.dir");
     private static final boolean isProd = appDir != null;
-    private static final String OS = (System.getProperty("os.name")).toUpperCase();
-
+    private static final String OS;
+    private static final String folderName = "Whatsapp Bot";
+    static {
+        String os = System.getProperty("os.name").toLowerCase();
+        OS = os.split(" ")[0];
+    }
 
     public static String getAppDir() {
         if (isProd) {
-            List<String> dirList = new ArrayList<>(Arrays.asList(appDir.split("/")));
-            Path productionPath = Paths.get("", dirList.toArray(new String[0]));
-            // TODO: Linux only?
-            return System.getProperty("file.separator") + productionPath;
+            if (OS.equals("windows")) {
+                return appDir;
+            } else {
+                List<String> dirList = new ArrayList<>(Arrays.asList(appDir.split("/")));
+                Path productionPath = Paths.get("", dirList.toArray(new String[0]));
+                return System.getProperty("file.separator") + productionPath;
+            }
         }
         return "res";
     }
 
     public static String getDbDir() {
         if (isProd) {
-            if (OS.contains("WIN")) {
-                // TODO: Test on Windows
-                return System.getenv("AppData");
+            if (OS.equals("windows")) {
+                String local = System.getenv("LocalAppData");
+                return Paths.get(local, folderName).toString();
             } else {
-                return Paths.get(System.getProperty("user.home"), ".wabot").toString();
+                String home = System.getProperty("user.home");
+                return Paths.get(home, "."+folderName).toString();
             }
         }
         return "res";
@@ -36,10 +44,19 @@ public class Util {
 
     public static String getChromeDriverPath() {
         String appDir = getAppDir();
-        if (isProd) {
-            // TODO: Linux only?
-            return Paths.get(appDir, "lib", "app", "chromedriver").toString();
+        String chromeDriver = ("chromedriver");
+        if(OS.equals("windows")){
+            chromeDriver  += (".exe");
         }
-        return Paths.get(appDir, "chromedriver").toString();
+
+        if (isProd) {
+            if (OS.equals("windows")) {
+                return Paths.get(appDir, chromeDriver).toString();
+            } else {
+                return Paths.get(appDir, "lib", "app", chromeDriver).toString();
+            }
+        }
+
+        return Paths.get(appDir, OS, chromeDriver).toString();
     }
 }

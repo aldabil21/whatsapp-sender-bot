@@ -12,7 +12,7 @@ import java.io.IOException;
 public class Main extends Application {
     public static void main(String[] args) {
         // Set chrome driver path
-        System.setProperty("webdriver.chrome.driver", Util.getChromeDriverPath());
+//        System.setProperty("webdriver.chrome.driver", Util.getChromeDriverPath());
         launch();
     }
 

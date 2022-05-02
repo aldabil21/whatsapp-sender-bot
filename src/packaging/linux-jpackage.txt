@@ -1,4 +1,3 @@
---name ${app.name}
 --icon "${project.basedir}/app-icon.png"
 --dest "${project.build.directory}"
 --main-jar ${project.build.finalName}.jar
@@ -7,4 +6,5 @@
 --app-version ${project.version}
 --runtime-image "${project.build.directory}/jvm-image"
 --temp "${project.build.directory}/installer-work"
---java-options "-Djava.app.dir=opt/wabot"
+--java-options "-Djava.app.dir=$APPDIR"
+--linux-package-name "Whatsapp Bot"

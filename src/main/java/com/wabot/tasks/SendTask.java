@@ -17,6 +17,10 @@ public class SendTask extends Task<Boolean> {
     private final String message;
     private final ChromeDriver driver;
     private Sender.Types type = Sender.Types.CHAT_LIST;
+    /**
+     * Only used in type = Types.LABELED_LIST
+     */
+    private String labelName;
 
     private int totalSent;
 
@@ -26,19 +30,34 @@ public class SendTask extends Task<Boolean> {
         this.notifier = notifier;
     }
 
-    public void setType(Sender.Types type) {
+    public void setType(Sender.Types type, String labelName) {
         this.type = type;
+        this.labelName = labelName;
+    }
+
+    public void setLabelName(String labelName) {
+        this.labelName = labelName;
     }
 
     @Override
     protected Boolean call() {
         if (type == Sender.Types.SAVED_LIST) {
             sendToSavedList();
+        } else if (type == Sender.Types.LABELED_LIST) {
+            sendToLabelList();
         } else {
             // Default fallback to CHAT_LIST - won't check it
             sendToChatList();
         }
         return true;
+    }
+
+    private void sendToChatList() {
+        WebElement sideList = driver.findElement(By.id("pane-side"));
+        // Get receivers
+        Set<String> receivers = collectReceivers(sideList);
+        // Execute sending
+        sendToReceivers(receivers, false);
     }
 
     private void sendToSavedList() {
@@ -62,13 +81,25 @@ public class SendTask extends Task<Boolean> {
 
     }
 
-    private void sendToChatList() {
-        WebElement sideList = driver.findElement(By.id("pane-side"));
-        // Get receivers
-        Set<String> receivers = collectReceivers(sideList);
+    private void sendToLabelList() {
+        goToLabelsList();
+        WebElement labelsArea = driver.findElement(By.className("copyable-area"));
+        WebElement label = labelsArea.findElement(By.cssSelector("div[role='gridcell'] span[title=" + labelName + "]"));
 
-        // Execute sending
-        sendToReceivers(receivers, false);
+        if (label == null) {
+            Alert alert = new UndecoratedAlert(Alert.AlertType.WARNING, "تأكد أن إسم التصنيف مطابق تماماً");
+            alert.setHeaderText("خطأ في العثور على التصنيف");
+            alert.showAndWait();
+            cancel();
+        }
+
+
+//        WebElement sideList = driver.findElement(By.id("pane-side"));
+//        // Get receivers
+//        Set<String> receivers = collectReceivers(sideList);
+//
+//        // Execute sending
+//        sendToReceivers(receivers, false);
     }
 
     private Set<String> collectReceivers(WebElement list) {
@@ -166,6 +197,26 @@ public class SendTask extends Task<Boolean> {
         WebElement side = driver.findElement(By.id("side"));
         WebElement header = side.findElement(By.tagName("header"));
         return header.findElement(By.cssSelector("div[role='button'] > span[data-icon='chat']"));
+    }
+
+    private void goToLabelsList() {
+        try {
+            WebElement side = driver.findElement(By.id("side"));
+            WebElement header = side.findElement(By.tagName("header"));
+            WebElement menu = header.findElement(By.cssSelector("div[role='button'] > span[data-icon='menu']"));
+            menu.click();
+            Thread.sleep(200);
+            List<WebElement> menuList = header.findElements(By.tagName("li"));
+            // Labels is the fifth item
+            menuList.get(4).click();
+            Thread.sleep(200);
+        } catch (Exception e) {
+            Alert alert = new UndecoratedAlert(Alert.AlertType.WARNING, "أطلب مساعدة من الأدمن");
+            alert.setHeaderText("خطأ في العثور على قائمة التصنيفات");
+            alert.showAndWait();
+            cancel();
+        }
+
     }
 
     private long getElementScrollHeight(WebElement el) {

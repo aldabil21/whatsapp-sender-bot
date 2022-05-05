@@ -83,12 +83,12 @@
                         </RadioButton>
                         <HBox alignment="CENTER_LEFT" nodeOrientation="RIGHT_TO_LEFT" spacing="12.0">
                             <children>
-                                <RadioButton fx:id="groupList" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" text="مجموعة معينة (خاص بواتساب أعمال)" toggleGroup="$receivers">
+                                <RadioButton fx:id="labeledList" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" text="إختيار تصنيف (خاص بواتساب أعمال)" toggleGroup="$receivers">
                                     <font>
                                         <Font size="14.0" />
                                     </font>
                                 </RadioButton>
-                                <TextField fx:id="groupListName" promptText="إسم المجموعة" />
+                                <TextField fx:id="labelName" promptText="إسم التصنيف" />
                             </children>
                             <opaqueInsets>
                                 <Insets />

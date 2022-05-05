@@ -11,17 +11,20 @@ import javafx.scene.control.ButtonType;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
-import java.io.IOException;
-
 public class Sender {
     private static final Notifier notifier = new Notifier();
     private final Types type;
     private final ChromeOptions chromeOptions = new ChromeOptions();
     private ChromeDriver driver;
-    private boolean scannedSuccess;
+    private String labelName;
 
-    public Sender(Types type) throws IOException {
+    public Sender(Types type) {
+        this(type, null);
+    }
+
+    public Sender(Types type, String labelName) {
         this.type = type;
+        this.labelName = labelName;
         chromeOptions.addArguments("no-sandbox", "disable-dev-shm-usage", "disable-extensions", "app=https://web.whatsapp.com", "start-maximized");
     }
 
@@ -34,7 +37,7 @@ public class Sender {
                 task.setOnSucceeded(workerStateEvent -> {
                     notifier.closeNotif();
                     SendTask sendTask = new SendTask(message, driver, notifier);
-                    sendTask.setType(type);
+                    sendTask.setType(type, labelName);
                     notifier.onProcessNotif("جاري التحضير للإرسال", sendTask);
                     new Thread(sendTask).start();
                 });
@@ -58,5 +61,5 @@ public class Sender {
         }
     }
 
-    public enum Types {CHAT_LIST, SAVED_LIST, GROUP_LIST}
+    public enum Types {CHAT_LIST, SAVED_LIST, LABELED_LIST}
 }

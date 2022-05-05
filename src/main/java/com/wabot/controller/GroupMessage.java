@@ -6,26 +6,22 @@ import javafx.fxml.FXML;
 import javafx.geometry.NodeOrientation;
 import javafx.scene.control.*;
 
-import java.io.IOException;
-
 public class GroupMessage {
-    @FXML
-    private RadioButton chatList;
     @FXML
     private RadioButton savedList;
     @FXML
-    private RadioButton groupList;
+    private RadioButton labeledList;
     @FXML
     private ToggleGroup receivers;
     @FXML
-    private TextField groupListName;
+    private TextField labelName;
     @FXML
     private TextArea message;
 
     public void initialize() {
         message.setStyle("-fx-font-family: OpenSansEmoji");
 
-        groupListName.visibleProperty().bind(receivers.getToggles().get(2).selectedProperty());
+        labelName.visibleProperty().bind(receivers.getToggles().get(2).selectedProperty());
 
         // Shouldn't this be the default behaviour?
         message.setOnKeyPressed(keyEvent -> {
@@ -46,19 +42,17 @@ public class GroupMessage {
         if (validate(selected)) {
             // Set selected job
             Sender.Types type = Sender.Types.CHAT_LIST;
-            if (selected == groupList) {
-                type = Sender.Types.GROUP_LIST;
+            if (selected == labeledList) {
+                type = Sender.Types.LABELED_LIST;
+                Sender sender = new Sender(type, labelName.getText());
+                sender.send(message.getText());
+                return;
             } else if (selected == savedList) {
                 type = Sender.Types.SAVED_LIST;
             }
 
-            try {
-                Sender sender = new Sender(type);
-                sender.send(message.getText());
-            } catch (IOException e) {
-                // TODO: show alert
-                throw new RuntimeException(e);
-            }
+            Sender sender = new Sender(type);
+            sender.send(message.getText());
         }
     }
 
@@ -70,8 +64,8 @@ public class GroupMessage {
             msg = "يرجى كتابة رسالة";
             isValid = false;
         }
-        if (isValid && selected == groupList && groupListName.getText().trim().isEmpty()) {
-            msg = "يرجى كتابة إسم المجموعة";
+        if (isValid && selected == labeledList && labelName.getText().trim().isEmpty()) {
+            msg = "يرجى كتابة إسم التصنيف";
             isValid = false;
         }
 

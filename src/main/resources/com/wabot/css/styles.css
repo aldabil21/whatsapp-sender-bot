@@ -1,3 +1,13 @@
+@font-face {
+    font-family: Cairo;
+    src: url("../font/Cairo-Regular.ttf");
+}
+
+@font-face {
+    font-family: Cairo-Bold;
+    src: url("../font/Cairo-Bold.ttf");
+}
+
 .root {
     primary: #283618;
     primary-light: #606c38;
@@ -6,17 +16,91 @@
     light-white: #EDF6F9;
 }
 
+* {
+    -fx-font-family: Cairo;
+}
+
+.bold {
+    -fx-font-weight: 700;
+}
+
+.radio-button {
+    -fx-font-size: 14;
+}
+
+.button {
+    -fx-background-radius: 0;
+    -fx-cursor: open-hand;
+    -fx-font-weight: 700;
+}
+
 .button.menu {
     -fx-background-color: #ffffff20;
     -fx-text-fill: light-white;
-    -fx-background-radius: 0;
-    -fx-graphic-text-gap: 15;
 }
 
-.button.menu:hover, .button.menu:selected {
+.button.menu:hover, .button.menu:pressed, .button.menu:selected, .button.menu.active {
     -fx-background-color: primary-light;
+    -fx-font-size: 20;
 }
 
 .button.menu:pressed {
-    -fx-background-color: primary;
+    -fx-background-color: #ffffff20;
+}
+
+.button.action {
+    -fx-background-color: secondary;
+    -fx-text-fill: light-white;
+    -fx-font-size: 22;
+}
+
+.button.action:hover {
+    -fx-background-color: secondary-light;
+}
+
+.button.action:pressed {
+    -fx-background-color: secondary;
+}
+
+.button.confirm {
+    -fx-background-color: #283618;
+    -fx-text-fill: #EDF6F9;
+}
+
+.dialog-pane .button {
+    -fx-background-radius: 0;
+    -fx-min-width: 200;
+    -fx-min-height: 50;
+    -fx-cursor: open-hand;
+    -fx-font-size: 22;
+}
+
+.button.confirm:hover {
+    -fx-background-color: #606c38;
+}
+
+.button.cancel {
+    -fx-background-color: transparent;
+}
+
+.button.cancel:hover {
+    -fx-background-color: #eee;
+}
+
+.button.secondary {
+    -fx-background-color: #bc6c25;
+    -fx-text-fill: #EDF6F9;
+}
+
+.button.secondary:hover {
+    -fx-background-color: #dda15e;
+}
+
+.progress-indicator {
+    -fx-progress-color: #283618;
+}
+
+.text-field, .text-area {
+    -fx-background-radius: 0;
+    -fx-border-color: primary;
 }

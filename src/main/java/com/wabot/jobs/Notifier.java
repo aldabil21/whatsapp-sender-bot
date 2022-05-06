@@ -128,13 +128,6 @@ public class Notifier {
         alert.show();
     }
 
-    public void onProcessUpdater() {
-//        DialogPane dialogPane = alert.getDialogPane();
-//        VBox box = (VBox) dialogPane.contentProperty().get();
-//        VBox labelBox = (VBox) box.getChildren().get(1);
-//        Label label = labelBox.getChildren().get()
-    }
-
     public void closeNotif() {
         if (alert.isShowing()) {
             alert.close();

@@ -23,8 +23,8 @@ public class QrCodeScan extends Task<Boolean> {
         WebElement sidePane = null;
         while (sidePane == null) {
             try {
-                // Check every 5 seconds if page is opened
-                Thread.sleep(5000);
+                // Check every 3 seconds if page is opened
+                Thread.sleep(3000);
                 // If side pane exists then its opened
                 sidePane = driver.findElement(By.id("pane-side"));
             } catch (Exception e) {

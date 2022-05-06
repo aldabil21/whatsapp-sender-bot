@@ -7,6 +7,7 @@ module com.wabot {
     requires org.kordamp.ikonli.javafx;
 
     requires org.seleniumhq.selenium.chrome_driver;
+    requires org.seleniumhq.selenium.support;
     requires io.github.bonigarcia.webdrivermanager;
 
 

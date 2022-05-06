@@ -6,8 +6,11 @@ import com.wabot.jobs.Notifier;
 import javafx.concurrent.Task;
 import javafx.scene.control.Alert;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.time.Duration;
 
 public class QrCodeScan extends Task<Boolean> {
     private final ChromeDriver driver;
@@ -20,22 +23,9 @@ public class QrCodeScan extends Task<Boolean> {
 
     @Override
     protected Boolean call() {
-        WebElement sidePane = null;
-        while (sidePane == null) {
-            try {
-                // Check every 3 seconds if page is opened
-                Thread.sleep(3000);
-                // If side pane exists then its opened
-                sidePane = driver.findElement(By.id("pane-side"));
-            } catch (Exception e) {
-                String msg = e.getMessage();
-                if (msg.contains("chrome not reachable")) {
-                    throw new RuntimeException(e);
-                } else {
-                    System.out.println("Not scanned yet");
-                }
-            }
-        }
+        // 120 seconds... too much?
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(120));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("pane-side")));
         return true;
     }
 
@@ -46,6 +36,9 @@ public class QrCodeScan extends Task<Boolean> {
 
     @Override
     protected void failed() {
+        if (driver != null) {
+            driver.quit();
+        }
         notifier.closeNotif();
         Alert alert = new UndecoratedAlert(Alert.AlertType.WARNING, "إذا لم تقم بإغلاق المتصفح بنفسك، تواصل مع الأدمن لحل المشكلة");
         alert.setHeaderText("المتصفح مفقود");

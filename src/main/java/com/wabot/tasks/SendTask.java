@@ -3,40 +3,55 @@ package com.wabot.tasks;
 import com.wabot.components.UndecoratedAlert;
 import com.wabot.jobs.Notifier;
 import com.wabot.jobs.Sender;
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.control.Alert;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.io.File;
+import java.time.Duration;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class SendTask extends Task<Boolean> {
-    private final Notifier notifier;
-    private final String message;
     private final ChromeDriver driver;
-    private Sender.Types type = Sender.Types.CHAT_LIST;
+    private final Notifier notifier;
+    private final Sender.Types type;
+    private final String message;
+    private final File media;
     /**
      * Only used in type = Types.LABELED_LIST
      */
-    private String labelName;
+    private final String labelName;
+    private final WebDriverWait wait;
     private int totalFound;
     private int totalSent;
 
-    public SendTask(String message, ChromeDriver driver, Notifier notifier) {
-        this.message = message;
+    public SendTask(ChromeDriver driver, Notifier notifier, Sender.Types type, String message, File media, String labelName) {
         this.driver = driver;
         this.notifier = notifier;
-    }
-
-    public void setType(Sender.Types type, String labelName) {
         this.type = type;
+        this.message = message;
+        this.media = media;
         this.labelName = labelName;
+
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+
+        if (media != null) {
+            putMediaInClipboard();
+        }
     }
 
     @Override
     protected Boolean call() {
+
         if (type == Sender.Types.SAVED_LIST) {
             sendToSavedList();
         } else if (type == Sender.Types.LABELED_LIST) {
@@ -49,6 +64,7 @@ public class SendTask extends Task<Boolean> {
     }
 
     private void sendToChatList() {
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("div[role='gridcell'][aria-colindex='2'] span[title]")));
         WebElement sideList = driver.findElement(By.id("pane-side"));
         // Get receivers
         Set<String> receivers = collectReceivers(sideList);
@@ -58,6 +74,8 @@ public class SendTask extends Task<Boolean> {
 
     private void sendToSavedList() {
         try {
+            wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("div[role='gridcell'][aria-colindex='2'] span[title]")));
+
             WebElement contactIcon = getContactsIcon();
             contactIcon.click();
             WebElement contactArea = driver.findElement(By.className("copyable-area"));
@@ -83,10 +101,12 @@ public class SendTask extends Task<Boolean> {
 
         // Find label if exists
         try {
+            Thread.sleep(3000);
             WebElement labelsArea = driver.findElement(By.className("copyable-area"));
             WebElement label = labelsArea.findElement(By.cssSelector("div[role='gridcell'] span[title='" + labelName + "']"));
             label.click();
             Thread.sleep(500);
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div[data-animate-drawer-title]")));
         } catch (Exception e) {
             throw new RuntimeException("لم يتم العثور على التصنيف " + labelName + ". تأكد أن إسم التصنيف مطابق تماما");
         }
@@ -94,17 +114,15 @@ public class SendTask extends Task<Boolean> {
         // Get receivers
         WebElement sideList = driver.findElement(By.id("pane-side"));
         Set<String> receivers = collectReceivers(sideList);
-        System.out.println(receivers.size());
-        System.out.println(receivers);
 
         try {
             // Go back - need to select back button each time since it gets detached from DOM
             WebElement back = getLabelsBackButton();
             back.click();
-            Thread.sleep(200);
+            Thread.sleep(500);
             back = getLabelsBackButton();
             back.click();
-            Thread.sleep(200);
+            Thread.sleep(500);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -122,17 +140,11 @@ public class SendTask extends Task<Boolean> {
             }
         });
 
-        try {
-            // Execute send for numbers
-            sendToReceivers(numbers, false);
-            // Execute send for names
-//            WebElement contactIcon = getContactsIcon();
-//            contactIcon.click();
-//            Thread.sleep(200);
-            sendToReceivers(names, true);
-        } catch (Exception e) {
-            // just for the sleep
-        }
+        // Execute send for numbers
+        sendToReceivers(numbers, false);
+
+        // Execute send for names
+        sendToReceivers(names, true);
 
     }
 
@@ -158,7 +170,7 @@ public class SendTask extends Task<Boolean> {
                 Thread.sleep(500);
             } catch (Exception e) {
                 String msg = e.getMessage();
-                if (e instanceof NoSuchSessionException) {
+                if (e instanceof WebDriverException) {
                     throw new RuntimeException(e);
                 } else {
                     System.out.println("Receivers: " + msg);
@@ -172,7 +184,6 @@ public class SendTask extends Task<Boolean> {
     }
 
     private void sendToReceivers(Set<String> receivers, boolean isSavedList) {
-
         for (String name : receivers) {
             if (isCancelled()) {
                 break;
@@ -184,7 +195,7 @@ public class SendTask extends Task<Boolean> {
                     if (totalSent > 0) {
                         WebElement contactIcon = getContactsIcon();
                         contactIcon.click();
-                        Thread.sleep(500);
+                        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div[data-animate-drawer-title]")));
                     }
                     WebElement contactArea = driver.findElement(By.className("copyable-area"));
                     searchBox = contactArea.findElement(By.cssSelector("div[role='textbox']"));
@@ -194,28 +205,50 @@ public class SendTask extends Task<Boolean> {
                 }
                 // insert name
                 searchBox.clear();
-                insertTextInput(searchBox, name);
-                Thread.sleep(500);
-                // click on name
-                WebElement row = driver.findElement(By.cssSelector("div[role='gridcell']"));
-                row.click();
+                insertTextInput(searchBox, name); //"+966 50 748 7620"); //
+                wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("span[data-icon='x-alt']")));
                 Thread.sleep(200);
+                // click on name - first instance
+                List<WebElement> row = driver.findElements(By.cssSelector("div[role='gridcell'] span[title]"));
+                row.get(0).click();
+
                 // Fill message
+                Thread.sleep(200);
                 WebElement main = driver.findElement(By.id("main"));
                 WebElement textBox = main.findElement(By.cssSelector("div[role='textbox']"));
                 textBox.clear();
-//                textBox.sendKeys(Keys.CONTROL + "v");
-                insertTextInput(textBox, this.message);
 
-                Thread.sleep(200);
-                // last button is send button
-                List<WebElement> buttons = main.findElements(By.tagName("button"));
-                WebElement send = buttons.get(buttons.size() - 1);
-                //send.click();
+                // Check if message is with media
+                WebElement sendButton;
+                if (media != null) {
+                    // Will copy to clipboard everytime in the loop
+                    // in case the user worked in other apps and copied something
+                    putMediaInClipboard();
+                    textBox.sendKeys(Keys.CONTROL + "v");
+                    wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("span[data-icon='emoji-input']")));
+                    Thread.sleep(500);
+                    WebElement middleArea = driver.findElement(By.className("copyable-area"));
+                    // if media != null  - message could be null
+                    if (this.message != null) {
+                        WebElement mediaTextBox = middleArea.findElement(By.cssSelector("div[role='textbox']"));
+                        insertTextInput(mediaTextBox, this.message);
+                    }
+                    Thread.sleep(200);
+                    List<WebElement> buttons = middleArea.findElements(By.cssSelector("div[role='button']"));
+                    sendButton = buttons.get(buttons.size() - 1);
+                } else {
+                    insertTextInput(textBox, this.message);
+                    Thread.sleep(200);
+                    // last button is send button
+                    List<WebElement> buttons = main.findElements(By.tagName("button"));
+                    sendButton = buttons.get(buttons.size() - 1);
+                }
+
+                sendButton.click();
 
                 totalSent++;
                 updateMessage("إرسال " + totalSent + " من " + totalFound);
-                Thread.sleep(200);
+                Thread.sleep(500);
             } catch (Exception e) {
                 String msg = e.getMessage();
                 if (e instanceof NoSuchElementException) {
@@ -230,28 +263,31 @@ public class SendTask extends Task<Boolean> {
     }
 
     private WebElement getContactsIcon() {
+        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("div[role='button'] > span[data-icon='chat']")));
         WebElement side = driver.findElement(By.id("side"));
         WebElement header = side.findElement(By.tagName("header"));
         return header.findElement(By.cssSelector("div[role='button'] > span[data-icon='chat']"));
     }
 
     private void goToLabelsList() {
-        // Menu seems to be loading slow
-        // I think whatsapp checks for version before fetching menu
-        // so here will make things pretty slow
-        // it's a single action anyway, not repetitive
         try {
-            Thread.sleep(2000);
+            wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("div[role='gridcell'][aria-colindex='2'] span[title]")));
+            wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("div[role='button'] > span[data-icon='menu']")));
             WebElement side = driver.findElement(By.id("side"));
             WebElement header = side.findElement(By.tagName("header"));
             WebElement menu = header.findElement(By.cssSelector("div[role='button'] > span[data-icon='menu']"));
             menu.click();
-            // If we enter labels menu so fast, chatList rows may end up in label as well
-            Thread.sleep(2000);
+            Thread.sleep(1000);
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.tagName("li")));
             List<WebElement> menuList = header.findElements(By.tagName("li"));
+
+            if (menuList.size() != 7) {
+                throw new RuntimeException("It seems that this is not a Whatsapp business version");
+            }
+
             // Labels is the fifth item
             menuList.get(4).click();
-            Thread.sleep(1000);
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div[data-animate-drawer-title]")));
         } catch (Exception e) {
             System.out.println(e.getMessage());
             throw new RuntimeException("خطأ في العثور على قائمة التصنيفات");
@@ -275,6 +311,15 @@ public class SendTask extends Task<Boolean> {
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollTo(0, arguments[1])", element, to);
     }
 
+    private void putMediaInClipboard() {
+        Platform.runLater(() -> {
+            Clipboard clipboard = Clipboard.getSystemClipboard();
+            ClipboardContent content = new ClipboardContent();
+            content.putFiles(Collections.singletonList(media));
+            clipboard.setContent(content);
+        });
+    }
+
     /**
      * This is needed cuz Whatsapp does not use semantic HTML input field,
      * so will need to trick the "div[role=textbox]" to simulate real input event
@@ -283,7 +328,7 @@ public class SendTask extends Task<Boolean> {
      * @param text    the string to insert
      */
     private void insertTextInput(WebElement element, String text) {
-        element.sendKeys("1"); // important to show send button
+        element.sendKeys("000000000000"); // important to show send button
         String script = "arguments[0].innerHTML = arguments[1];" + "arguments[0].dispatchEvent(new Event('keydown', {bubbles: true}));" +
                 "arguments[0].dispatchEvent(new Event('keypress', {bubbles: true}));" +
                 "arguments[0].dispatchEvent(new Event('input', {bubbles: true}));" +

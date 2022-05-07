@@ -205,8 +205,7 @@ public class SendTask extends Task<Boolean> {
                 }
                 // insert name
                 searchBox.clear();
-                insertTextInput(searchBox, name); //"+966 50 748 7620"); //
-                wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("span[data-icon='x-alt']")));
+                insertTextInput(searchBox, name); // "+966 50 748 7620"); //
                 Thread.sleep(200);
                 // click on name - first instance
                 List<WebElement> row = driver.findElements(By.cssSelector("div[role='gridcell'] span[title]"));
@@ -245,6 +244,7 @@ public class SendTask extends Task<Boolean> {
                 }
 
                 sendButton.click();
+                wait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector("span[data-icon='msg-time']")));
 
                 totalSent++;
                 updateMessage("إرسال " + totalSent + " من " + totalFound);
@@ -271,15 +271,20 @@ public class SendTask extends Task<Boolean> {
 
     private void goToLabelsList() {
         try {
-            wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("div[role='gridcell'][aria-colindex='2'] span[title]")));
-            wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("div[role='button'] > span[data-icon='menu']")));
+//            wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("div[role='gridcell'][aria-colindex='2'] span[title]")));
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("side")));
             WebElement side = driver.findElement(By.id("side"));
+            wait.until(ExpectedConditions.visibilityOf(side.findElement(By.tagName("header"))));
             WebElement header = side.findElement(By.tagName("header"));
-            WebElement menu = header.findElement(By.cssSelector("div[role='button'] > span[data-icon='menu']"));
-            menu.click();
-            Thread.sleep(1000);
-            wait.until(ExpectedConditions.visibilityOfElementLocated(By.tagName("li")));
-            List<WebElement> menuList = header.findElements(By.tagName("li"));
+            // Whatsapp header menu is flickry!!
+            Thread.sleep(2000);
+            List<WebElement> menu = header.findElements(By.cssSelector("div[role='button']"));
+            WebElement menuItem = menu.get(menu.size() - 1);
+            wait.until(ExpectedConditions.elementToBeClickable(menuItem));
+            menuItem.click();
+            wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("li > div[role='button']")));
+//            Thread.sleep(1000);
+            List<WebElement> menuList = header.findElements(By.cssSelector("li > div[role='button']"));
 
             if (menuList.size() != 7) {
                 throw new RuntimeException("It seems that this is not a Whatsapp business version");
@@ -290,7 +295,7 @@ public class SendTask extends Task<Boolean> {
             wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div[data-animate-drawer-title]")));
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            throw new RuntimeException("خطأ في العثور على قائمة التصنيفات");
+            throw new RuntimeException(e.getMessage()); //"خطأ في العثور على قائمة التصنيفات");
         }
 
     }
@@ -334,6 +339,7 @@ public class SendTask extends Task<Boolean> {
                 "arguments[0].dispatchEvent(new Event('input', {bubbles: true}));" +
                 "arguments[0].dispatchEvent(new Event('keyup', {bubbles: true}));";
         ((JavascriptExecutor) driver).executeScript(script, element, text);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("span[data-icon='x-alt']")));
     }
 
     private boolean isPhoneNumber(String string) {

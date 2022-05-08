@@ -3,6 +3,7 @@ package com.wabot.tasks;
 import com.wabot.components.UndecoratedAlert;
 import com.wabot.jobs.Notifier;
 import com.wabot.jobs.Sender;
+import com.wabot.model.ExcelRow;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.control.Alert;
@@ -34,6 +35,16 @@ public class SendTask extends Task<Boolean> {
     private int totalFound;
     private int totalSent;
 
+    private List<ExcelRow> excelList;
+
+    /**
+     * Excel list constructor
+     */
+    public SendTask(ChromeDriver driver, Notifier notifier, List<ExcelRow> excelList) {
+        this(driver, notifier, Sender.Types.EXCEL_LIST, null, null, null);
+        this.excelList = excelList;
+    }
+
     public SendTask(ChromeDriver driver, Notifier notifier, Sender.Types type, String message, File media, String labelName) {
         this.driver = driver;
         this.notifier = notifier;
@@ -51,8 +62,9 @@ public class SendTask extends Task<Boolean> {
 
     @Override
     protected Boolean call() {
-
-        if (type == Sender.Types.SAVED_LIST) {
+        if (type == Sender.Types.EXCEL_LIST) {
+            sendToExcelList();
+        } else if (type == Sender.Types.SAVED_LIST) {
             sendToSavedList();
         } else if (type == Sender.Types.LABELED_LIST) {
             sendToLabelList();
@@ -142,10 +154,23 @@ public class SendTask extends Task<Boolean> {
 
         // Execute send for numbers
         sendToReceivers(numbers, false);
-
         // Execute send for names
         sendToReceivers(names, true);
+    }
 
+    private void sendToExcelList() {
+        for (ExcelRow row : excelList) {
+            try {
+                insertClickableAnchor(row.getNumber());
+                WebElement anchor = driver.findElement(By.id("excel-list-anchor"));
+                anchor.click();
+                
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+                //
+            }
+
+        }
     }
 
     private Set<String> collectReceivers(WebElement list) {
@@ -162,6 +187,9 @@ public class SendTask extends Task<Boolean> {
                     if (isCancelled()) {
                         break OUTER;
                     }
+                    // Check for updated only during collecting numbers/names
+                    updateBrowserIfNeeded();
+
                     receivers.add(name.getText());
                     updateMessage("تم العثور على " + receivers.size() + " مستلم");
                 }
@@ -208,8 +236,8 @@ public class SendTask extends Task<Boolean> {
                 insertTextInput(searchBox, name); // "+966 50 748 7620"); //
                 Thread.sleep(200);
                 // click on name - first instance
-                List<WebElement> row = driver.findElements(By.cssSelector("div[role='gridcell'] span[title]"));
-                row.get(0).click();
+                WebElement row = driver.findElement(By.cssSelector("div[role='gridcell'] span[title='" + name + "']"));
+                row.click();
 
                 // Fill message
                 Thread.sleep(200);
@@ -300,6 +328,23 @@ public class SendTask extends Task<Boolean> {
 
     }
 
+    private void insertClickableAnchor(String number) {
+        try {
+            String script = "const el = document.getElementById('excel-list-anchor');" +
+                    "if (el) {" +
+                    "el.setAttribute('href', arguments[0]);" +
+                    "} else {" +
+                    "const newEl = '<a id=" + "excel-list-anchor" + " href=></a>';" +
+                    "document.body.insertAdjacentHTML('afterbegin', newEl);" +
+                    "document.getElementById('excel-list-anchor1').setAttribute('href', arguments[0]);" +
+                    "}";
+            ((JavascriptExecutor) driver).executeScript(script, number);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            //
+        }
+    }
+
     private long getElementScrollHeight(WebElement el) {
         return (long) ((JavascriptExecutor) driver).executeScript("return arguments[0].scrollHeight", el);
     }
@@ -323,6 +368,20 @@ public class SendTask extends Task<Boolean> {
             content.putFiles(Collections.singletonList(media));
             clipboard.setContent(content);
         });
+    }
+
+    private void updateBrowserIfNeeded() {
+        try {
+            WebElement updater = driver.findElement(By.cssSelector("span[data-icon='alert-update']"));
+            updater.click();
+            WebDriverWait longWait = new WebDriverWait(driver, Duration.ofSeconds(30));
+            longWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("side")));
+        } catch (Exception e) {
+            // Nothing to do unless it's a timeout after update
+            if (e instanceof TimeoutException) {
+                throw new RuntimeException("خطأ في تحميل التحديثات اللازمة");
+            }
+        }
     }
 
     /**

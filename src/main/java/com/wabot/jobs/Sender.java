@@ -1,6 +1,7 @@
 package com.wabot.jobs;
 
 import com.wabot.components.UndecoratedAlert;
+import com.wabot.model.ExcelRow;
 import com.wabot.tasks.QrCodeScan;
 import com.wabot.tasks.SendTask;
 import io.github.bonigarcia.wdm.WebDriverManager;
@@ -12,6 +13,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
 import java.io.File;
+import java.util.List;
 
 public class Sender {
     private static final Notifier notifier = new Notifier();
@@ -22,6 +24,14 @@ public class Sender {
         chromeOptions.addArguments("no-sandbox", "disable-dev-shm-usage", "disable-extensions", "app=https://web.whatsapp.com", "start-maximized");
     }
 
+    /**
+     * Send to chat list, saved numbers, or labels
+     *
+     * @param type      enum @Sender.Types
+     * @param message   String message
+     * @param media     File of image/video
+     * @param labelName option for Whatsapp business to send to specific label
+     */
     public void send(Types type, String message, File media, String labelName) {
         if (notifier.agreeToScanNotif()) {
             if (initDriver()) {
@@ -31,6 +41,27 @@ public class Sender {
                 task.setOnSucceeded(workerStateEvent -> {
                     notifier.closeNotif();
                     SendTask sendTask = new SendTask(driver, notifier, type, message, media, labelName);
+                    notifier.onProcessNotif("جاري التحضير للإرسال", sendTask);
+                    new Thread(sendTask).start();
+                });
+            }
+        }
+    }
+
+    /**
+     * Send to specific numbers loaded via Sxcel
+     *
+     * @param list List of @ExcelRow
+     */
+    public void send(List<ExcelRow> list) {
+        if (notifier.agreeToScanNotif()) {
+            if (initDriver()) {
+                notifier.waitingScanNotif();
+                Task<Boolean> task = new QrCodeScan(driver, notifier);
+                new Thread(task).start();
+                task.setOnSucceeded(workerStateEvent -> {
+                    notifier.closeNotif();
+                    SendTask sendTask = new SendTask(driver, notifier, list);
                     notifier.onProcessNotif("جاري التحضير للإرسال", sendTask);
                     new Thread(sendTask).start();
                 });
@@ -54,5 +85,5 @@ public class Sender {
         }
     }
 
-    public enum Types {CHAT_LIST, SAVED_LIST, LABELED_LIST}
+    public enum Types {CHAT_LIST, SAVED_LIST, LABELED_LIST, EXCEL_LIST}
 }

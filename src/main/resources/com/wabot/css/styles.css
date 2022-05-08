@@ -104,3 +104,7 @@
     -fx-background-radius: 0;
     -fx-border-color: primary;
 }
+
+.table-view .column-header {
+    /*-fx-background-color: primary-light;*/
+}

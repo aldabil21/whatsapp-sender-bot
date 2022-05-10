@@ -43,6 +43,7 @@ public class SendTask extends Task<Boolean> {
     public SendTask(ChromeDriver driver, Notifier notifier, List<ExcelRow> excelList) {
         this(driver, notifier, Sender.Types.EXCEL_LIST, null, null, null);
         this.excelList = excelList;
+        this.totalFound = excelList.size();
     }
 
     public SendTask(ChromeDriver driver, Notifier notifier, Sender.Types type, String message, File media, String labelName) {
@@ -159,17 +160,53 @@ public class SendTask extends Task<Boolean> {
     }
 
     private void sendToExcelList() {
+        WebDriverWait shortWait = new WebDriverWait(driver, Duration.ofSeconds(2));
         for (ExcelRow row : excelList) {
             try {
-                insertClickableAnchor(row.getNumber());
+                String number = row.getNumber();
+                String message = row.getMessage();
+                insertClickableAnchor(number);
+
+                wait.until(ExpectedConditions.elementToBeClickable(By.id("excel-list-anchor")));
                 WebElement anchor = driver.findElement(By.id("excel-list-anchor"));
                 anchor.click();
-                
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-                //
-            }
 
+                // Wait for loader to finish
+                shortWait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector("div[role='dialog']")));
+
+                //Double check in case missed
+                WebElement dialog = numberNotExists();
+                if (dialog != null) {
+                    throw new RuntimeException();
+                }
+                // Fill message
+                WebElement main = driver.findElement(By.id("main"));
+                WebElement textBox = main.findElement(By.cssSelector("div[role='textbox']"));
+                textBox.clear();
+
+                // last button is send button
+                insertTextInput(textBox, message);
+                List<WebElement> buttons = main.findElements(By.tagName("button"));
+                WebElement sendButton = buttons.get(buttons.size() - 1);
+
+                sendButton.click();
+                wait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector("span[data-icon='msg-time']")));
+
+                totalSent++;
+                updateMessage("إرسال " + totalSent + " من " + totalFound);
+
+            } catch (Exception e) {
+                if (e instanceof TimeoutException) {
+                    WebElement dialog = numberNotExists();
+                    if (dialog != null) {
+                        dialog.findElement(By.cssSelector("div[role='dialog'] div[role='button']")).click();
+                    }
+                } else if (e instanceof NoSuchSessionException) {
+                    throw new RuntimeException(e);
+                } else {
+                    System.out.println("Sender: " + e.getMessage());
+                }
+            }
         }
     }
 
@@ -234,7 +271,8 @@ public class SendTask extends Task<Boolean> {
                 // insert name
                 searchBox.clear();
                 insertTextInput(searchBox, name); // "+966 50 748 7620"); //
-                Thread.sleep(200);
+                wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("span[data-icon='x-alt']")));
+//                Thread.sleep(200);
                 // click on name - first instance
                 WebElement row = driver.findElement(By.cssSelector("div[role='gridcell'] span[title='" + name + "']"));
                 row.click();
@@ -260,12 +298,12 @@ public class SendTask extends Task<Boolean> {
                         WebElement mediaTextBox = middleArea.findElement(By.cssSelector("div[role='textbox']"));
                         insertTextInput(mediaTextBox, this.message);
                     }
-                    Thread.sleep(200);
+//                    Thread.sleep(200);
                     List<WebElement> buttons = middleArea.findElements(By.cssSelector("div[role='button']"));
                     sendButton = buttons.get(buttons.size() - 1);
                 } else {
                     insertTextInput(textBox, this.message);
-                    Thread.sleep(200);
+//                    Thread.sleep(200);
                     // last button is send button
                     List<WebElement> buttons = main.findElements(By.tagName("button"));
                     sendButton = buttons.get(buttons.size() - 1);
@@ -276,7 +314,7 @@ public class SendTask extends Task<Boolean> {
 
                 totalSent++;
                 updateMessage("إرسال " + totalSent + " من " + totalFound);
-                Thread.sleep(500);
+                Thread.sleep(200);
             } catch (Exception e) {
                 String msg = e.getMessage();
                 if (e instanceof NoSuchElementException) {
@@ -331,17 +369,20 @@ public class SendTask extends Task<Boolean> {
     private void insertClickableAnchor(String number) {
         try {
             String script = "const el = document.getElementById('excel-list-anchor');" +
-                    "if (el) {" +
-                    "el.setAttribute('href', arguments[0]);" +
-                    "} else {" +
-                    "const newEl = '<a id=" + "excel-list-anchor" + " href=></a>';" +
-                    "document.body.insertAdjacentHTML('afterbegin', newEl);" +
-                    "document.getElementById('excel-list-anchor1').setAttribute('href', arguments[0]);" +
-                    "}";
+                    "if (el) { el.remove(); }" +
+                    "document.querySelector('.app-wrapper-web').insertAdjacentHTML('afterbegin', `<a id='excel-list-anchor' href='https://api.whatsapp.com/send?phone=${arguments[0]}'>${arguments[0]}</a>`);";
             ((JavascriptExecutor) driver).executeScript(script, number);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             //
+        }
+    }
+
+    private WebElement numberNotExists() {
+        try {
+            return driver.findElement(By.cssSelector("div[role=dialog]"));
+        } catch (Exception e) {
+            return null;
         }
     }
 
@@ -398,7 +439,7 @@ public class SendTask extends Task<Boolean> {
                 "arguments[0].dispatchEvent(new Event('input', {bubbles: true}));" +
                 "arguments[0].dispatchEvent(new Event('keyup', {bubbles: true}));";
         ((JavascriptExecutor) driver).executeScript(script, element, text);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("span[data-icon='x-alt']")));
+//        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("span[data-icon='x-alt']")));
     }
 
     private boolean isPhoneNumber(String string) {

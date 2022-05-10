@@ -16,9 +16,9 @@ import java.io.File;
 import java.util.List;
 
 public class Sender {
-    private static final Notifier notifier = new Notifier();
+    public static final Notifier notifier = new Notifier();
+    public static ChromeDriver driver;
     private final ChromeOptions chromeOptions = new ChromeOptions();
-    private ChromeDriver driver;
 
     public Sender() {
         chromeOptions.addArguments("no-sandbox", "disable-dev-shm-usage", "disable-extensions", "app=https://web.whatsapp.com", "start-maximized");
@@ -33,18 +33,14 @@ public class Sender {
      * @param labelName option for Whatsapp business to send to specific label
      */
     public void send(Types type, String message, File media, String labelName) {
-        if (notifier.agreeToScanNotif()) {
-            if (initDriver()) {
-                notifier.waitingScanNotif();
-                Task<Boolean> task = new QrCodeScan(driver, notifier);
-                new Thread(task).start();
-                task.setOnSucceeded(workerStateEvent -> {
-                    notifier.closeNotif();
-                    SendTask sendTask = new SendTask(driver, notifier, type, message, media, labelName);
-                    notifier.onProcessNotif("جاري التحضير للإرسال", sendTask);
-                    new Thread(sendTask).start();
-                });
-            }
+        Task<Boolean> task = initScanTask();
+        if (task != null) {
+            task.setOnSucceeded(workerStateEvent -> {
+                notifier.closeNotif();
+                SendTask sendTask = new SendTask(driver, notifier, type, message, media, labelName);
+                notifier.onProcessNotif("جاري التحضير للإرسال", sendTask);
+                new Thread(sendTask).start();
+            });
         }
     }
 
@@ -54,19 +50,32 @@ public class Sender {
      * @param list List of @ExcelRow
      */
     public void send(List<ExcelRow> list) {
+        Task<Boolean> task = initScanTask();
+        if (task != null) {
+            task.setOnSucceeded(workerStateEvent -> {
+                notifier.closeNotif();
+                SendTask sendTask = new SendTask(driver, notifier, list);
+                notifier.onProcessNotif("جاري التحضير للإرسال", sendTask);
+                new Thread(sendTask).start();
+            });
+
+        }
+
+    }
+
+    /**
+     * Scan unsaved numbers in whatsapp and save them in Excel file
+     */
+    public Task<Boolean> initScanTask() {
         if (notifier.agreeToScanNotif()) {
             if (initDriver()) {
                 notifier.waitingScanNotif();
                 Task<Boolean> task = new QrCodeScan(driver, notifier);
                 new Thread(task).start();
-                task.setOnSucceeded(workerStateEvent -> {
-                    notifier.closeNotif();
-                    SendTask sendTask = new SendTask(driver, notifier, list);
-                    notifier.onProcessNotif("جاري التحضير للإرسال", sendTask);
-                    new Thread(sendTask).start();
-                });
+                return task;
             }
         }
+        return null;
     }
 
     private boolean initDriver() {

@@ -35,21 +35,15 @@ public class LoadExcel extends Service<ObservableList<ExcelRow>> {
                     int i = 1;
                     for (Row row : sheet) {
                         try {
-                            Cell phoneCol = row.getCell(0);
-                            Cell msgCol = row.getCell(1);
-
-                            BigDecimal firstCol = BigDecimal.valueOf(phoneCol.getNumericCellValue());
-                            long phoneNum = firstCol.longValue();
-
-                            String phone = String.valueOf(phoneNum);
-                            String message = msgCol.getStringCellValue();
+                            String phone = getCellValue(row.getCell(0));
+                            String message = getCellValue(row.getCell(1));
                             if (!phone.isEmpty() && !message.isEmpty()) {
                                 ExcelRow tableRow = new ExcelRow(i, phone.replaceAll(" ", ""), message);
                                 if (!rows.contains(tableRow)) {
                                     rows.add(tableRow);
+                                    updateValue(FXCollections.observableArrayList(rows));
                                     i++;
                                 }
-                                updateValue(FXCollections.observableArrayList(rows));
                                 updateProgress(row.getRowNum(), sheet.getLastRowNum());
                             }
                         } catch (Exception e) {
@@ -61,6 +55,15 @@ public class LoadExcel extends Service<ObservableList<ExcelRow>> {
                 }
                 return FXCollections.observableArrayList(rows);
             }
+        };
+    }
+
+
+    private String getCellValue(Cell cell) {
+        return switch (cell.getCellType()) {
+            case NUMERIC -> String.valueOf(BigDecimal.valueOf(cell.getNumericCellValue()).longValue());
+            case STRING -> cell.getStringCellValue();
+            default -> "";
         };
     }
 }

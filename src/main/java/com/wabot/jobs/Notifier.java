@@ -91,7 +91,7 @@ public class Notifier {
         alert.show();
     }
 
-    public void onProcessNotif(String msg, Task<Boolean> task) {
+    public void onProcessNotif(String msg, Task<?> task) {
         VBox vBox = new VBox();
         Label message = new Label(msg);
         message.setWrapText(true);

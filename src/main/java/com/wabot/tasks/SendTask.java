@@ -272,7 +272,7 @@ public class SendTask extends Task<Boolean> {
                 searchBox.clear();
                 insertTextInput(searchBox, name); // "+966 50 748 7620"); //
                 wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("span[data-icon='x-alt']")));
-//                Thread.sleep(200);
+                Thread.sleep(200);
                 // click on name - first instance
                 WebElement row = driver.findElement(By.cssSelector("div[role='gridcell'] span[title='" + name + "']"));
                 row.click();
@@ -290,20 +290,18 @@ public class SendTask extends Task<Boolean> {
                     // in case the user worked in other apps and copied something
                     putMediaInClipboard();
                     textBox.sendKeys(Keys.CONTROL + "v");
-                    wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("span[data-icon='emoji-input']")));
-                    Thread.sleep(500);
+                    wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("span[data-icon='emoji-input']")));
+                    Thread.sleep(200);
                     WebElement middleArea = driver.findElement(By.className("copyable-area"));
                     // if media != null  - message could be null
                     if (this.message != null) {
                         WebElement mediaTextBox = middleArea.findElement(By.cssSelector("div[role='textbox']"));
                         insertTextInput(mediaTextBox, this.message);
                     }
-//                    Thread.sleep(200);
                     List<WebElement> buttons = middleArea.findElements(By.cssSelector("div[role='button']"));
                     sendButton = buttons.get(buttons.size() - 1);
                 } else {
                     insertTextInput(textBox, this.message);
-//                    Thread.sleep(200);
                     // last button is send button
                     List<WebElement> buttons = main.findElements(By.tagName("button"));
                     sendButton = buttons.get(buttons.size() - 1);
@@ -349,11 +347,11 @@ public class SendTask extends Task<Boolean> {
             wait.until(ExpectedConditions.elementToBeClickable(menuItem));
             menuItem.click();
             wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("li > div[role='button']")));
-//            Thread.sleep(1000);
+
             List<WebElement> menuList = header.findElements(By.cssSelector("li > div[role='button']"));
 
             if (menuList.size() != 7) {
-                throw new RuntimeException("It seems that this is not a Whatsapp business version");
+                throw new RuntimeException("يبدو أن نسخة الواتساب ليسيت واتساب أعمال");
             }
 
             // Labels is the fifth item

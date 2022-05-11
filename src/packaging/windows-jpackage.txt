@@ -1,6 +1,6 @@
 --type msi
---win-menu-group ${windows.vendor}
---vendor ${windows.vendor}
+--win-menu-group ${app.vendor}
+--vendor ${app.vendor}
 --icon "${project.basedir}/app-icon.ico"
 --dest "${project.build.directory}"
 --main-jar ${project.build.finalName}.jar
@@ -10,7 +10,7 @@
 --runtime-image "${project.build.directory}/jvm-image"
 --temp "${project.build.directory}/installer-work"
 --win-upgrade-uuid ${windows.upgrade.uuid}
---copyright "(C) ${windows.vendor}"
+--copyright "(C) ${app.vendor}"
 --java-options "-Djava.app.dir=$APPDIR"
 --win-menu
 --win-shortcut

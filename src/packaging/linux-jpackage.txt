@@ -1,3 +1,4 @@
+--vendor ${app.vendor}
 --icon "${project.basedir}/app-icon.png"
 --dest "${project.build.directory}"
 --main-jar ${project.build.finalName}.jar
@@ -7,3 +8,4 @@
 --runtime-image "${project.build.directory}/jvm-image"
 --temp "${project.build.directory}/installer-work"
 --java-options "-Djava.app.dir=$APPDIR"
+--linux-shortcut

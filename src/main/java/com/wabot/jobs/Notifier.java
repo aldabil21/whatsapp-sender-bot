@@ -11,6 +11,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -31,6 +32,7 @@ public class Notifier {
         alert.setGraphic(null);
         alert.initStyle(StageStyle.UNDECORATED);
         DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.setMaxWidth(homeOverlayPane.getPrefWidth());
         dialogPane.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
         dialogPane.getStylesheets()
                 .add(Objects.requireNonNull(Main.class.getResource("css/styles.css")).toExternalForm());

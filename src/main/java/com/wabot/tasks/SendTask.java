@@ -364,14 +364,13 @@ public class SendTask extends Task<Boolean> {
             List<WebElement> menuList = header.findElements(By.cssSelector("li > div[role='button']"));
 
             if (menuList.size() != 7) {
-                throw new RuntimeException("يبدو أن نسخة الواتساب ليسيت واتساب أعمال");
+                throw new RuntimeException("يبدو أن نسخة الواتساب ليست واتساب أعمال");
             }
 
             // Labels is the fifth item
             menuList.get(4).click();
             wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div[data-animate-drawer-title]")));
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             throw new RuntimeException(e.getMessage()); // "خطأ في العثور على قائمة التصنيفات");
         }
 

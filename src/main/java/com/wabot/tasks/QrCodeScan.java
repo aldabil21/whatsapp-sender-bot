@@ -43,8 +43,8 @@ public class QrCodeScan extends Task<ChromeDriver> {
         driver = new ChromeDriver(chromeOptions);
         updateMessage("");
 
-        // 120 seconds... too much?
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(120));
+        // 180 seconds... too much? Donno downloading time...
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(180));
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("pane-side")));
 
         return driver;

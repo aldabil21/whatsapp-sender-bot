@@ -2,6 +2,7 @@ package com.wabot.controller;
 
 import com.wabot.components.UndecoratedAlert;
 import com.wabot.jobs.Sender;
+import com.wabot.jobs.Notifier;
 import com.wabot.model.ExcelRow;
 import com.wabot.tasks.SaveTask;
 import javafx.concurrent.Task;
@@ -13,6 +14,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.openqa.selenium.chrome.ChromeDriver;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -31,30 +33,28 @@ public class ExportNumbers {
         saveButton.setOnAction(event -> onDownloadExcel());
 
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter(".xlsx", "*.xlsx")
-        );
+                new FileChooser.ExtensionFilter(".xlsx", "*.xlsx"));
     }
 
     @FXML
     private void onScanNumbers() {
         Sender sender = new Sender();
-        Task<Boolean> scan = sender.initScanTask();
-        if (scan != null) {
-            scan.setOnSucceeded(workerStateEvent -> {
-                startSearching();
+
+        Task<ChromeDriver> task = sender.initScanTask();
+
+        if (task != null) {
+
+            task.setOnSucceeded(event -> {
+                Notifier notifier = sender.getNotifier();
+                notifier.closeNotif();
+                SaveTask saveTask = new SaveTask(task.getValue(), notifier);
+                notifier.onProcessNotif("جاري التحضير للإرسال", saveTask);
+                new Thread(saveTask).start();
+                table.itemsProperty().bind(saveTask.valueProperty());
+                progress.visibleProperty().bind(saveTask.runningProperty());
+                saveButton.disableProperty().bind(saveTask.runningProperty());
             });
         }
-    }
-
-    private void startSearching() {
-        Sender.notifier.closeNotif();
-        SaveTask saveTask = new SaveTask(Sender.driver, Sender.notifier);
-        Sender.notifier.onProcessNotif("جاري التحضير للإرسال", saveTask);
-        new Thread(saveTask).start();
-
-        table.itemsProperty().bind(saveTask.valueProperty());
-        progress.visibleProperty().bind(saveTask.runningProperty());
-        saveButton.disableProperty().bind(saveTask.runningProperty());
     }
 
     private void onDownloadExcel() {
@@ -72,7 +72,7 @@ public class ExportNumbers {
         File file = fileChooser.showSaveDialog(table.getScene().getWindow());
         if (file != null) {
             try (Workbook workbook = new HSSFWorkbook();
-                 FileOutputStream os = new FileOutputStream(file.getAbsolutePath())) {
+                    FileOutputStream os = new FileOutputStream(file.getAbsolutePath())) {
                 Sheet sheet = workbook.createSheet("numbers");
                 for (int i = 0; i < table.getItems().size(); i++) {
                     Row row = sheet.createRow(i);

@@ -11,10 +11,10 @@ module com.wabot {
     requires org.seleniumhq.selenium.support;
     requires io.github.bonigarcia.webdrivermanager;
 
-
     exports com.wabot;
     exports com.wabot.controller;
     exports com.wabot.components;
+
     opens com.wabot to javafx.fxml;
     opens com.wabot.controller to javafx.fxml;
     opens com.wabot.components to javafx.fxml;

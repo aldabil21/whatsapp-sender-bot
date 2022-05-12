@@ -32,7 +32,8 @@ public class Notifier {
         alert.initStyle(StageStyle.UNDECORATED);
         DialogPane dialogPane = alert.getDialogPane();
         dialogPane.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
-        dialogPane.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("css/styles.css")).toExternalForm());
+        dialogPane.getStylesheets()
+                .add(Objects.requireNonNull(Main.class.getResource("css/styles.css")).toExternalForm());
         dialogPane.getStyleClass().add("notifier");
     }
 
@@ -74,7 +75,7 @@ public class Notifier {
         return result.get() == confirm;
     }
 
-    public void waitingScanNotif() {
+    public void waitingScanNotif(Task<?> task) {
         String imgSrc = Objects.requireNonNull(Main.class.getResource("images/qrcode.png")).toExternalForm();
         ImageView image = new ImageView(imgSrc);
         image.setFitWidth(170);
@@ -84,8 +85,14 @@ public class Notifier {
         progress.prefHeight(100);
         progress.setPadding(new Insets(0, 0, 10, 0));
 
+        Label message = new Label();
+        message.setWrapText(true);
+        message.setAlignment(Pos.CENTER);
+        message.textProperty().bind(task.messageProperty());
+
         updateHeader("بإنتظار مسح الـQR");
-        updateContent(null, progress, image);
+        updateContent(null, progress, message, image);
+
         alert.setAlertType(Alert.AlertType.NONE);
         alert.getButtonTypes().setAll();
         alert.show();

@@ -30,7 +30,7 @@
 
 .button {
     -fx-background-radius: 0;
-    -fx-cursor: open-hand;
+    -fx-cursor: hand;
     -fx-font-weight: 700;
 }
 

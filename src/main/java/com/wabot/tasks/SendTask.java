@@ -46,7 +46,8 @@ public class SendTask extends Task<Boolean> {
         this.totalFound = excelList.size();
     }
 
-    public SendTask(ChromeDriver driver, Notifier notifier, Sender.Types type, String message, File media, String labelName) {
+    public SendTask(ChromeDriver driver, Notifier notifier, Sender.Types type, String message, File media,
+            String labelName) {
         this.driver = driver;
         this.notifier = notifier;
         this.type = type;
@@ -77,7 +78,8 @@ public class SendTask extends Task<Boolean> {
     }
 
     private void sendToChatList() {
-        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("div[role='gridcell'][aria-colindex='2'] span[title]")));
+        wait.until(ExpectedConditions
+                .elementToBeClickable(By.cssSelector("div[role='gridcell'][aria-colindex='2'] span[title]")));
         WebElement sideList = driver.findElement(By.id("pane-side"));
         // Get receivers
         Set<String> receivers = collectReceivers(sideList);
@@ -87,12 +89,14 @@ public class SendTask extends Task<Boolean> {
 
     private void sendToSavedList() {
         try {
-            wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("div[role='gridcell'][aria-colindex='2'] span[title]")));
+            wait.until(ExpectedConditions
+                    .elementToBeClickable(By.cssSelector("div[role='gridcell'][aria-colindex='2'] span[title]")));
 
             WebElement contactIcon = getContactsIcon();
             contactIcon.click();
             WebElement contactArea = driver.findElement(By.className("copyable-area"));
-            WebElement contacts = contactArea.findElement(By.cssSelector("div[data-tab='4']")).findElement(By.xpath("./.."));
+            WebElement contacts = contactArea.findElement(By.cssSelector("div[data-tab='4']"))
+                    .findElement(By.xpath("./.."));
 
             // Get receivers
             Set<String> receivers = collectReceivers(contacts);
@@ -116,7 +120,8 @@ public class SendTask extends Task<Boolean> {
         try {
             Thread.sleep(3000);
             WebElement labelsArea = driver.findElement(By.className("copyable-area"));
-            WebElement label = labelsArea.findElement(By.cssSelector("div[role='gridcell'] span[title='" + labelName + "']"));
+            WebElement label = labelsArea
+                    .findElement(By.cssSelector("div[role='gridcell'] span[title='" + labelName + "']"));
             label.click();
             Thread.sleep(500);
             wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div[data-animate-drawer-title]")));
@@ -129,7 +134,8 @@ public class SendTask extends Task<Boolean> {
         Set<String> receivers = collectReceivers(sideList);
 
         try {
-            // Go back - need to select back button each time since it gets detached from DOM
+            // Go back - need to select back button each time since it gets detached from
+            // DOM
             WebElement back = getLabelsBackButton();
             back.click();
             Thread.sleep(500);
@@ -174,7 +180,7 @@ public class SendTask extends Task<Boolean> {
                 // Wait for loader to finish
                 shortWait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector("div[role='dialog']")));
 
-                //Double check in case missed
+                // Double check in case missed
                 WebElement dialog = numberNotExists();
                 if (dialog != null) {
                     throw new RuntimeException();
@@ -190,7 +196,8 @@ public class SendTask extends Task<Boolean> {
                 WebElement sendButton = buttons.get(buttons.size() - 1);
 
                 sendButton.click();
-                wait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector("span[data-icon='msg-time']")));
+                wait.until(
+                        ExpectedConditions.invisibilityOfElementLocated(By.cssSelector("span[data-icon='msg-time']")));
 
                 totalSent++;
                 updateMessage("إرسال " + totalSent + " من " + totalFound);
@@ -216,10 +223,10 @@ public class SendTask extends Task<Boolean> {
         long currentHeight = 0;
 
         Set<String> receivers = new HashSet<>();
-        OUTER:
-        do {
+        OUTER: do {
             try {
-                List<WebElement> names = list.findElements(By.cssSelector("div[role='gridcell'][aria-colindex='2'] span[title]"));
+                List<WebElement> names = list
+                        .findElements(By.cssSelector("div[role='gridcell'][aria-colindex='2'] span[title]"));
                 for (WebElement name : names) {
                     if (isCancelled()) {
                         break OUTER;
@@ -255,12 +262,14 @@ public class SendTask extends Task<Boolean> {
             }
             try {
                 WebElement searchBox;
-                // in saved list, we need query element each time due to DOM detachment of the side pane
+                // in saved list, we need query element each time due to DOM detachment of the
+                // side pane
                 if (isSavedList) {
                     if (totalSent > 0) {
                         WebElement contactIcon = getContactsIcon();
                         contactIcon.click();
-                        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div[data-animate-drawer-title]")));
+                        wait.until(ExpectedConditions
+                                .visibilityOfElementLocated(By.cssSelector("div[data-animate-drawer-title]")));
                     }
                     WebElement contactArea = driver.findElement(By.className("copyable-area"));
                     searchBox = contactArea.findElement(By.cssSelector("div[role='textbox']"));
@@ -290,10 +299,11 @@ public class SendTask extends Task<Boolean> {
                     // in case the user worked in other apps and copied something
                     putMediaInClipboard();
                     textBox.sendKeys(Keys.CONTROL + "v");
-                    wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("span[data-icon='emoji-input']")));
+                    wait.until(
+                            ExpectedConditions.elementToBeClickable(By.cssSelector("span[data-icon='emoji-input']")));
                     Thread.sleep(200);
                     WebElement middleArea = driver.findElement(By.className("copyable-area"));
-                    // if media != null  - message could be null
+                    // if media != null - message could be null
                     if (this.message != null) {
                         WebElement mediaTextBox = middleArea.findElement(By.cssSelector("div[role='textbox']"));
                         insertTextInput(mediaTextBox, this.message);
@@ -308,7 +318,8 @@ public class SendTask extends Task<Boolean> {
                 }
 
                 sendButton.click();
-                wait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector("span[data-icon='msg-time']")));
+                wait.until(
+                        ExpectedConditions.invisibilityOfElementLocated(By.cssSelector("span[data-icon='msg-time']")));
 
                 totalSent++;
                 updateMessage("إرسال " + totalSent + " من " + totalFound);
@@ -327,7 +338,8 @@ public class SendTask extends Task<Boolean> {
     }
 
     private WebElement getContactsIcon() {
-        wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("div[role='button'] > span[data-icon='chat']")));
+        wait.until(
+                ExpectedConditions.elementToBeClickable(By.cssSelector("div[role='button'] > span[data-icon='chat']")));
         WebElement side = driver.findElement(By.id("side"));
         WebElement header = side.findElement(By.tagName("header"));
         return header.findElement(By.cssSelector("div[role='button'] > span[data-icon='chat']"));
@@ -335,7 +347,8 @@ public class SendTask extends Task<Boolean> {
 
     private void goToLabelsList() {
         try {
-//            wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("div[role='gridcell'][aria-colindex='2'] span[title]")));
+            // wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("div[role='gridcell'][aria-colindex='2']
+            // span[title]")));
             wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("side")));
             WebElement side = driver.findElement(By.id("side"));
             wait.until(ExpectedConditions.visibilityOf(side.findElement(By.tagName("header"))));
@@ -359,7 +372,7 @@ public class SendTask extends Task<Boolean> {
             wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div[data-animate-drawer-title]")));
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            throw new RuntimeException(e.getMessage()); //"خطأ في العثور على قائمة التصنيفات");
+            throw new RuntimeException(e.getMessage()); // "خطأ في العثور على قائمة التصنيفات");
         }
 
     }
@@ -432,12 +445,13 @@ public class SendTask extends Task<Boolean> {
      */
     private void insertTextInput(WebElement element, String text) {
         element.sendKeys("000000000000"); // important to show send button
-        String script = "arguments[0].innerHTML = arguments[1];" + "arguments[0].dispatchEvent(new Event('keydown', {bubbles: true}));" +
+        String script = "arguments[0].innerHTML = arguments[1];"
+                + "arguments[0].dispatchEvent(new Event('keydown', {bubbles: true}));" +
                 "arguments[0].dispatchEvent(new Event('keypress', {bubbles: true}));" +
                 "arguments[0].dispatchEvent(new Event('input', {bubbles: true}));" +
                 "arguments[0].dispatchEvent(new Event('keyup', {bubbles: true}));";
         ((JavascriptExecutor) driver).executeScript(script, element, text);
-//        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("span[data-icon='x-alt']")));
+        // wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("span[data-icon='x-alt']")));
     }
 
     private boolean isPhoneNumber(String string) {

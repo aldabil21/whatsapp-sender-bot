@@ -41,12 +41,12 @@
                         </StackPane>
                         <HBox alignment="CENTER_RIGHT" GridPane.columnIndex="1">
                             <children>
-                                <Button fx:id="minimize" alignment="CENTER_RIGHT" mnemonicParsing="false" style="-fx-background-color: transparent;">
+                                <Button fx:id="minimize" alignment="CENTER_RIGHT" focusTraversable="false" mnemonicParsing="false" style="-fx-background-color: transparent;">
                                     <graphic>
                                         <FontIcon iconColor="#949494" iconLiteral="fth-minus" iconSize="30" />
                                     </graphic>
                                 </Button>
-                                <Button alignment="CENTER_RIGHT" mnemonicParsing="false" onAction="#handleClose" style="-fx-background-color: transparent;">
+                                <Button alignment="CENTER_RIGHT" focusTraversable="false" mnemonicParsing="false" onAction="#handleClose" style="-fx-background-color: transparent;">
                                     <graphic>
                                         <FontIcon iconColor="#c60000" iconLiteral="fth-x-circle" iconSize="25" />
                                     </graphic>
@@ -61,22 +61,22 @@
                     <children>
                         <Pane prefHeight="135.0" prefWidth="250.0" style="-fx-background-color: #ffffff10;">
                      <children>
-                        <VBox alignment="CENTER" prefWidth="250.0">
+                        <VBox alignment="BOTTOM_CENTER" prefWidth="250.0">
                            <children>
-                              <ImageView fitHeight="115.0" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fitHeight="100.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
                                     <Image url="@images/wabot-side.png" />
                                  </image>
                                  <VBox.margin>
-                                    <Insets top="-33.0" />
+                                    <Insets top="-20.0" />
                                  </VBox.margin>
                               </ImageView>
                                       <Label alignment="TOP_CENTER" contentDisplay="CENTER" prefHeight="34.0" style="-fx-text-fill: light-white;" styleClass="bold" text="واتساب رسايل بوت">
                                           <font>
-                                              <Font name="Cairo Bold" size="27.0" />
+                                              <Font name="Cairo Bold" size="25.0" />
                                           </font>
                                  <VBox.margin>
-                                    <Insets />
+                                    <Insets top="5.0" />
                                  </VBox.margin>
                                       </Label>
                            </children>

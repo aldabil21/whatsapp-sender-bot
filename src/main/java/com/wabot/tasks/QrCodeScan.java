@@ -36,8 +36,8 @@ public class QrCodeScan extends Task<ChromeDriver> {
 
     @Override
     protected ChromeDriver call() {
-        StringBuilder sb = new StringBuilder("فتح المتصفح لأول مرة قد يستغرق");
-        sb.append(System.lineSeparator()).append("2-3 دقائق يرجى الإنتظار");
+        StringBuilder sb = new StringBuilder("فتح المتصفح بعد أول تنصيب قد");
+        sb.append(System.lineSeparator()).append("يستغرق 2-3 دقائق يرجى الإنتظار");
         updateMessage(sb.toString());
         WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver(chromeOptions);

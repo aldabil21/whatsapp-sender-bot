@@ -69,6 +69,11 @@ public class ExcelImport {
                     msgCell.setCellValue("رسالة رقم " + (i + 1));
                 }
                 workbook.write(os);
+
+                ButtonType btn = new ButtonType("أوك", ButtonBar.ButtonData.CANCEL_CLOSE);
+                Alert alert = new UndecoratedAlert(Alert.AlertType.INFORMATION, "", btn);
+                alert.setHeaderText("تم الحفظ");
+                alert.show();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

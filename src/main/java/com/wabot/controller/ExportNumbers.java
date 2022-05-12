@@ -9,11 +9,11 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.openqa.selenium.chrome.ChromeDriver;
 
 import java.io.File;
@@ -71,7 +71,7 @@ public class ExportNumbers {
         fileChooser.setInitialFileName("whatsapp-numbers.xlsx");
         File file = fileChooser.showSaveDialog(table.getScene().getWindow());
         if (file != null) {
-            try (Workbook workbook = new HSSFWorkbook();
+            try (Workbook workbook = new XSSFWorkbook();
                     FileOutputStream os = new FileOutputStream(file.getAbsolutePath())) {
                 Sheet sheet = workbook.createSheet("numbers");
                 for (int i = 0; i < table.getItems().size(); i++) {

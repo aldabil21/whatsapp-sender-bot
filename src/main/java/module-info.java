@@ -5,6 +5,7 @@ module com.wabot {
     requires org.xerial.sqlitejdbc;
 
     requires org.apache.poi.poi;
+    requires org.apache.poi.ooxml;
     requires org.kordamp.ikonli.javafx;
 
     requires org.seleniumhq.selenium.chrome_driver;

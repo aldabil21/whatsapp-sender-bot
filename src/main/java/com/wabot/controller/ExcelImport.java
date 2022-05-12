@@ -8,11 +8,11 @@ import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -36,8 +36,7 @@ public class ExcelImport {
         sendButton.setOnAction(event -> onSend());
 
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter(".xlsx", "*.xlsx")
-        );
+                new FileChooser.ExtensionFilter(".xlsx", "*.xlsx"));
     }
 
     @FXML
@@ -59,8 +58,8 @@ public class ExcelImport {
         fileChooser.setInitialFileName("whatsapp-example.xlsx");
         File file = fileChooser.showSaveDialog(table.getScene().getWindow());
         if (file != null) {
-            try (Workbook workbook = new HSSFWorkbook();
-                 FileOutputStream os = new FileOutputStream(file.getAbsolutePath())) {
+            try (Workbook workbook = new XSSFWorkbook();
+                    FileOutputStream os = new FileOutputStream(file.getAbsolutePath())) {
                 Sheet sheet = workbook.createSheet("numbers");
                 for (int i = 0; i < 2; i++) {
                     Row row = sheet.createRow(i);
